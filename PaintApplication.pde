@@ -1,8 +1,8 @@
-String[][] options = {{"File","New","Save","Delete"},{"Edit","Clear"}};
+String[][] options = {{"File","New","Save","Save as","Delete"},{"Edit","Clear"}};
 menuBar menu = new menuBar();
 boolean activePage = false;
 PGraphics page;
-String deafultSaveLocation = "test.png";
+String deafultSaveLocation = null;
 
 int correctedHeight;
 boolean screenGrab = false;
@@ -54,11 +54,20 @@ void newPage(int x,int y){
 
 void processOption(String s){
 		switch (s) {
-			case "Save":
+			case "Save as":
 				if (activePage){
 	  				selectOutput("Select a folder to process:", "fileSelected");
 					break;
 				}
+			case "Save":
+				if (activePage){
+					if  (deafultSaveLocation!=null){
+						saveFile();
+					} else {
+						processOption("Save as");
+					}
+				}
+				break;
 			case "Clear":
 				clearScreen();
 				break;
@@ -75,11 +84,14 @@ void processOption(String s){
 				break;	
 		}
 	}
-
+void saveFile(){
+	page.save(deafultSaveLocation);
+}
 void fileSelected(File selection) {
 	if (selection == null) {
 		println("Window was closed or the user hit cancel.");
 	} else {
-		page.save(selection.getAbsolutePath());
+		deafultSaveLocation = selection.getAbsolutePath();
+		page.save(deafultSaveLocation);
 	}
 }
