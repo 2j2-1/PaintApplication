@@ -14,16 +14,14 @@ import java.io.IOException;
 
 public class PaintApplication extends PApplet {
 
-String[][] options = {{"File","New","Save","Delete"},{"Edit","Clear"}};
+String[][] options = {{"File","New","Save","Save as","Delete"},{"Edit","Clear"}};
 menuBar menu = new menuBar();
 boolean activePage = false;
 PGraphics page;
-String deafultSaveLocation = "test.png";
+String deafultSaveLocation = null;
 
-
-int x = 640;
-int y = 640;
-
+int correctedHeight;
+boolean screenGrab = false;
 
 
 public void settings(){
@@ -32,6 +30,7 @@ public void settings(){
 }
 public void setup(){
 	menu.setup();
+	correctedHeight = height - menu.menuHeight;
 }
 
 public void draw(){
@@ -48,11 +47,12 @@ public void draw(){
 		menu.chosenOption = null;
 	}
 	
-	
 }
 
 public void mouseClicked(){
-	menu.collide();
+	if (!screenGrab){
+		menu.collide();
+	}
 }
 
 public void clearScreen(){
@@ -70,17 +70,25 @@ public void newPage(int x,int y){
 
 public void processOption(String s){
 		switch (s) {
+			case "Save as":
+				if (activePage){
+	  				selectOutput("Select a folder to process:", "fileSelected");
+					break;
+				}
 			case "Save":
 				if (activePage){
-				println("File Saved");
-				page.save(deafultSaveLocation);
+					if  (deafultSaveLocation!=null){
+						saveFile();
+					} else {
+						processOption("Save as");
+					}
 				}
 				break;
 			case "Clear":
 				clearScreen();
 				break;
 			case "New":
-				newPage(min(width,700),min(height-menu.menuHeight,640));
+				newPage(min(width,700),min(correctedHeight,640));
 				activePage = true;
 				break;
 			case "Delete":
@@ -92,6 +100,17 @@ public void processOption(String s){
 				break;	
 		}
 	}
+public void saveFile(){
+	page.save(deafultSaveLocation);
+}
+public void fileSelected(File selection) {
+	if (selection == null) {
+		println("Window was closed or the user hit cancel.");
+	} else {
+		deafultSaveLocation = selection.getAbsolutePath();
+		page.save(deafultSaveLocation);
+	}
+}
 // Main windows background color
 int backgroundColor = color(100);
 
