@@ -33,13 +33,13 @@ class menuBar{
 		}
 	}
 
-	void collide(int mode){
+	void collide(){
 
-		if (mouseY<=20 && mode == 0){
+		if (mouseY<=20 ){
 			active = !active;
 		}
 
-		else if (active && mode == 0 && activeOption>0 && activeOption<options[menuBarOption].length){
+		else if (active && activeOption>0 && activeOption<options[menuBarOption].length){
 			chosenOption = options[menuBarOption][activeOption];
 			active = false;
 		}

@@ -1,7 +1,8 @@
 String[][] options = {{"File","New","Save","Delete"},{"Edit","Clear"}};
 menuBar menu = new menuBar();
-
+boolean activePage = false;
 PGraphics page;
+String deafultSaveLocation = "test.png";
 
 
 int x = 640;
@@ -10,7 +11,8 @@ int y = 640;
 
 
 void settings(){
-	size(x,y);
+	// size(x,y);
+	fullScreen();
 }
 void setup(){
 	menu.setup();
@@ -19,16 +21,12 @@ void setup(){
 void draw(){
 	background(backgroundColor);
 
-	try{
+	if(activePage){
 		image(page,(width-page.width)/2,(height+menu.menuHeight-page.height)/2);
 	}
-	catch (Exception e){}
 
 	menu.display();
 
-	if (mousePressed){
-		menu.collide(1);
-	}
 	if (menu.chosenOption!=null){
 		processOption(menu.chosenOption);
 		menu.chosenOption = null;
@@ -38,11 +36,13 @@ void draw(){
 }
 
 void mouseClicked(){
-	menu.collide(0);
+	menu.collide();
 }
 
 void clearScreen(){
-	background(0);
+	if (activePage){
+		page.background(backgroundColor);
+	}
 }
 
 void newPage(int x,int y){
@@ -55,16 +55,21 @@ void newPage(int x,int y){
 void processOption(String s){
 		switch (s) {
 			case "Save":
+				if (activePage){
 				println("File Saved");
+				page.save(deafultSaveLocation);
+				}
 				break;
 			case "Clear":
 				clearScreen();
 				break;
 			case "New":
 				newPage(min(width,700),min(height-menu.menuHeight,640));
+				activePage = true;
 				break;
 			case "Delete":
 				page = null;
+				activePage = false;
 				break;
 			default:
 				println("Function not yet implemented");
