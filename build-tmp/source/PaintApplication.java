@@ -94,7 +94,9 @@ class imageDrawing{
 	int x;
 	int y;
 	int menuWidth = 200;
+	int spacing = 30;
 	boolean displayMenu = false;
+	Slider alphaS = new Slider(0,spacing*2+menuWidth,menuWidth,"Alpha:",sideMenu,0,100);
 	imageDrawing(int _x, int _y) {
 		x = _x;
 		y = _y;
@@ -107,8 +109,19 @@ class imageDrawing{
 		sideMenu.rect(0,0,menuWidth,height);
 		sideMenu.fill(menuText);
 		sideMenu.textSize(textSize);
-		sideMenu.textAlign(LEFT, TOP);
-		sideMenu.text("Color Picker",0,0);
+		sideMenu.textAlign(LEFT, CENTER);
+
+
+		sideMenu.text("Color Picker",0,0,menuWidth,spacing);
+		sideMenu.loadPixels();
+		colorMode(HSB, 100);
+		for (int x = 0; x < menuWidth; x++){
+			for (int y = 0; y < menuWidth; y++){
+				sideMenu.pixels[x + (y+spacing)*menuWidth] = color(map(x,0,menuWidth,0,100),100,map(y,0,menuWidth,0,100));
+			}
+		}
+		sideMenu.updatePixels();
+		alphaS.display();
 		sideMenu.endDraw();
 		image(sideMenu,x,menu.menuHeight,menuWidth,correctedHeight);
 	}
@@ -256,6 +269,38 @@ public void fileSelected(File selection) {
 		deafultSaveLocation = selection.getAbsolutePath();
 		page.save(deafultSaveLocation);
 	}
+}
+// import processing.core.*;
+
+class Slider{
+	int x;
+	int y;
+	int length;
+	String text;
+	PGraphics window;
+	int value = 0;
+	int max;
+	int min;
+
+	Slider(int _x,int _y, int _length, String _text, PGraphics _window,int _min,int _max) {
+		x = _x;
+		y = _y;
+		length = _length;
+		text = _text + " ";
+		window = _window;
+		max = _max;
+		min = _min;
+	}
+
+	public void display(){
+		value = constrain(value,min,max);
+		sideMenu.textAlign(LEFT, BOTTOM);
+		sideMenu.text(text + str(value),x,y);
+		sideMenu.rect(x,y, length,10);
+		sideMenu.fill(0);
+		sideMenu.ellipse(value, y+5, 10, 10);
+	}
+
 }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "--present", "--window-color=#666666", "--hide-stop", "PaintApplication" };
