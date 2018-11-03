@@ -4,10 +4,8 @@ boolean activePage = false;
 PGraphics page;
 String deafultSaveLocation = "test.png";
 
-
-int x = 640;
-int y = 640;
-
+int correctedHeight;
+boolean screenGrab = false;
 
 
 void settings(){
@@ -16,6 +14,7 @@ void settings(){
 }
 void setup(){
 	menu.setup();
+	correctedHeight = height - menu.menuHeight;
 }
 
 void draw(){
@@ -32,11 +31,12 @@ void draw(){
 		menu.chosenOption = null;
 	}
 	
-	
 }
 
 void mouseClicked(){
-	menu.collide();
+	if (!screenGrab){
+		menu.collide();
+	}
 }
 
 void clearScreen(){
@@ -56,15 +56,14 @@ void processOption(String s){
 		switch (s) {
 			case "Save":
 				if (activePage){
-				println("File Saved");
-				page.save(deafultSaveLocation);
+	  				selectOutput("Select a folder to process:", "fileSelected");
+					break;
 				}
-				break;
 			case "Clear":
 				clearScreen();
 				break;
 			case "New":
-				newPage(min(width,700),min(height-menu.menuHeight,640));
+				newPage(min(width,700),min(correctedHeight,640));
 				activePage = true;
 				break;
 			case "Delete":
@@ -76,3 +75,11 @@ void processOption(String s){
 				break;	
 		}
 	}
+
+void fileSelected(File selection) {
+	if (selection == null) {
+		println("Window was closed or the user hit cancel.");
+	} else {
+		page.save(selection.getAbsolutePath());
+	}
+}
