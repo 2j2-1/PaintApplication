@@ -1,12 +1,12 @@
 class menuBar{
 	
-	int spacing = 50;
+	int spacing = 60;
 	int menuHeight = 20;
 	boolean active = false;
 	int activeOption = -1;
 	int menuBarOption;
 	String chosenOption = null;
-	int textSize = 16;
+	
 	menuBar () {
 		
 	}
@@ -25,7 +25,7 @@ class menuBar{
 		for (int i = 0; i < options.length; i++) {
 			text(options[i][0],spacing*i,0,spacing,menuHeight);
 		}
-		if (mouseY<=20 && active){
+		if (mouseY<=menuHeight && active){
 			menuBarOption = int(mouseX/spacing);
 		}
 		if (active && menuBarOption<options.length){
@@ -76,7 +76,9 @@ class menuBar{
 
 void clearScreen(){
 	if (activePage){
-		page.background(backgroundColor);
+		page.beginDraw();
+		page.background(pageColor);
+		page.endDraw();
 	}
 }
 
@@ -85,6 +87,8 @@ void newPage(int x,int y){
 	page.beginDraw();
 	page.background(255);
 	page.endDraw();
+	pageOffset[0] = (width-page.width)/2;
+	pageOffset[1] =(height+menu.menuHeight-page.height)/2;
 }
 
 void processOption(String s){
@@ -107,13 +111,20 @@ void processOption(String s){
 				clearScreen();
 				break;
 			case "New":
-				newPage(min(width,700),min(correctedHeight,640));
+				newPage(min(width,800),min(correctedHeight,800));
 				activePage = true;
 				break;
 			case "Delete":
 				page = null;
 				activePage = false;
 				break;
+			case "Drawing Menu":
+				if (activeMenu==1){
+					activeMenu = 0;
+				}
+				else {
+					activeMenu = 1;
+				}
 			default:
 				println("Function not yet implemented");
 				break;	
