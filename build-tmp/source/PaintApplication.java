@@ -50,7 +50,7 @@ public void draw(){
 		image(page,pageOffset[0],pageOffset[1]);
 		if (mousePressed){
 			page.beginDraw();
-			page.stroke(10);
+			page.stroke(brushColor);
 			page.strokeWeight(10);
 			page.line(mouseX-pageOffset[0],mouseY-pageOffset[1],pmouseX-pageOffset[0],pmouseY-pageOffset[1]);
 			page.endDraw();
@@ -68,6 +68,9 @@ public void draw(){
 		processOption(menu.chosenOption);
 		menu.chosenOption = null;
 	}
+	if (mousePressed){
+		iD.collide(1);
+	}
 	
 	
 }
@@ -75,6 +78,7 @@ public void draw(){
 public void mouseClicked(){
 	if (!screenGrab){
 		menu.collide();
+		iD.collide(0);
 	}
 }
 
@@ -88,6 +92,7 @@ int menuText = color(255);
 
 //Page Color
 int pageColor = color(255);
+int brushColor = color(0);
 class imageDrawing{
 	
 	ArrayList<String> options = new ArrayList<String>();
@@ -96,7 +101,8 @@ class imageDrawing{
 	int menuWidth = 200;
 	int spacing = 30;
 	boolean displayMenu = false;
-	Slider alphaS = new Slider(0,spacing*2+menuWidth,menuWidth,"Alpha:",sideMenu,0,100);
+	Slider brightnessS = new Slider(0,spacing*2+menuWidth,menuWidth,"Brightness:",sideMenu,0,100);
+	Slider brushSize = new Slider(0,spacing*3+menuWidth,menuWidth,"BrushSize:",sideMenu,0,100);
 	imageDrawing(int _x, int _y) {
 		x = _x;
 		y = _y;
@@ -121,15 +127,28 @@ class imageDrawing{
 			}
 		}
 		sideMenu.updatePixels();
-		alphaS.display();
+		brightnessS.display();
+		brushSize.display();
 		sideMenu.endDraw();
 		image(sideMenu,x,menu.menuHeight,menuWidth,correctedHeight);
+	}
+
+	public void collide(int mode){
+		if (mouseX<menuWidth && mouseY>menu.menuHeight+spacing && mouseY<spacing+menuWidth+menu.menuHeight && activeMenu == 1){
+
+			
+			brushColor = color(map(mouseX,0,menuWidth,0,100),100,map(mouseY-menu.menuHeight-spacing,0,menuWidth,0,100));
+			fill(brushColor);
+			stroke(1);
+			ellipse(mouseX, mouseY, 10, 10);
+			noStroke();
+		}
 	}
 
 }
 class menuBar{
 	
-	int spacing = 60;
+	int spacing = 50;
 	int menuHeight = 20;
 	boolean active = false;
 	int activeOption = -1;
@@ -160,6 +179,7 @@ class menuBar{
 		if (active && menuBarOption<options.length){
 			displayOptions(menuBarOption);
 		}
+		
 	}
 
 	public void collide(){
@@ -185,19 +205,19 @@ class menuBar{
 
 		
 		fill(menuFill);
-		rect(optionNumber*spacing,menuHeight,spacing*2,(options[optionNumber].length-1)*menuHeight);
+		rect(optionNumber*spacing,menuHeight,spacing*3,(options[optionNumber].length-1)*menuHeight);
 		
 		activeOption = PApplet.parseInt(mouseY/menuHeight);
 		if (activeOption>0 && activeOption<options[optionNumber].length){
 			fill(menuHighlight);
-			rect(spacing*optionNumber,activeOption*menuHeight,spacing*2,menuHeight);
+			rect(spacing*optionNumber,activeOption*menuHeight,spacing*3,menuHeight);
 		}
 
 		fill(menuText);
 		textAlign(LEFT, CENTER);
 
 		for (int i = 1; i<options[optionNumber].length; i++){
-			text(options[optionNumber][i],spacing*optionNumber,menuHeight*i,spacing*2,menuHeight);
+			text(options[optionNumber][i],spacing*optionNumber,menuHeight*i,spacing*3,menuHeight);
 		}
 	}
 	
@@ -240,7 +260,7 @@ public void processOption(String s){
 				clearScreen();
 				break;
 			case "New":
-				newPage(min(width,800),min(correctedHeight,800));
+				newPage(min(width,1900),min(correctedHeight,1000));
 				activePage = true;
 				break;
 			case "Delete":
@@ -254,8 +274,9 @@ public void processOption(String s){
 				else {
 					activeMenu = 1;
 				}
+				break;
 			default:
-				println("Function not yet implemented");
+				println(s+" not yet implemented");
 				break;	
 		}
 	}
@@ -295,10 +316,14 @@ class Slider{
 	public void display(){
 		value = constrain(value,min,max);
 		sideMenu.textAlign(LEFT, BOTTOM);
+		sideMenu.fill(255);
 		sideMenu.text(text + str(value),x,y);
 		sideMenu.rect(x,y, length,10);
 		sideMenu.fill(0);
 		sideMenu.ellipse(value, y+5, 10, 10);
+	}
+	public void collide(){
+		
 	}
 
 }

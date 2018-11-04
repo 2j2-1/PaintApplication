@@ -1,6 +1,6 @@
 class menuBar{
 	
-	int spacing = 60;
+	int spacing = 50;
 	int menuHeight = 20;
 	boolean active = false;
 	int activeOption = -1;
@@ -31,6 +31,7 @@ class menuBar{
 		if (active && menuBarOption<options.length){
 			displayOptions(menuBarOption);
 		}
+		
 	}
 
 	void collide(){
@@ -56,19 +57,19 @@ class menuBar{
 
 		
 		fill(menuFill);
-		rect(optionNumber*spacing,menuHeight,spacing*2,(options[optionNumber].length-1)*menuHeight);
+		rect(optionNumber*spacing,menuHeight,spacing*3,(options[optionNumber].length-1)*menuHeight);
 		
 		activeOption = int(mouseY/menuHeight);
 		if (activeOption>0 && activeOption<options[optionNumber].length){
 			fill(menuHighlight);
-			rect(spacing*optionNumber,activeOption*menuHeight,spacing*2,menuHeight);
+			rect(spacing*optionNumber,activeOption*menuHeight,spacing*3,menuHeight);
 		}
 
 		fill(menuText);
 		textAlign(LEFT, CENTER);
 
 		for (int i = 1; i<options[optionNumber].length; i++){
-			text(options[optionNumber][i],spacing*optionNumber,menuHeight*i,spacing*2,menuHeight);
+			text(options[optionNumber][i],spacing*optionNumber,menuHeight*i,spacing*3,menuHeight);
 		}
 	}
 	
@@ -111,7 +112,7 @@ void processOption(String s){
 				clearScreen();
 				break;
 			case "New":
-				newPage(min(width,800),min(correctedHeight,800));
+				newPage(min(width,1900),min(correctedHeight,1000));
 				activePage = true;
 				break;
 			case "Delete":
@@ -125,8 +126,9 @@ void processOption(String s){
 				else {
 					activeMenu = 1;
 				}
+				break;
 			default:
-				println("Function not yet implemented");
+				println(s+" not yet implemented");
 				break;	
 		}
 	}

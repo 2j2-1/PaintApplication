@@ -6,7 +6,8 @@ class imageDrawing{
 	int menuWidth = 200;
 	int spacing = 30;
 	boolean displayMenu = false;
-	Slider alphaS = new Slider(0,spacing*2+menuWidth,menuWidth,"Alpha:",sideMenu,0,100);
+	Slider brightnessS = new Slider(0,spacing*2+menuWidth,menuWidth,"Brightness:",sideMenu,0,100);
+	Slider brushSize = new Slider(0,spacing*3+menuWidth,menuWidth,"BrushSize:",sideMenu,0,100);
 	imageDrawing(int _x, int _y) {
 		x = _x;
 		y = _y;
@@ -31,9 +32,22 @@ class imageDrawing{
 			}
 		}
 		sideMenu.updatePixels();
-		alphaS.display();
+		brightnessS.display();
+		brushSize.display();
 		sideMenu.endDraw();
 		image(sideMenu,x,menu.menuHeight,menuWidth,correctedHeight);
+	}
+
+	void collide(int mode){
+		if (mouseX<menuWidth && mouseY>menu.menuHeight+spacing && mouseY<spacing+menuWidth+menu.menuHeight && activeMenu == 1){
+
+			
+			brushColor = color(map(mouseX,0,menuWidth,0,100),100,map(mouseY-menu.menuHeight-spacing,0,menuWidth,0,100));
+			fill(brushColor);
+			stroke(1);
+			ellipse(mouseX, mouseY, 10, 10);
+			noStroke();
+		}
 	}
 
 }

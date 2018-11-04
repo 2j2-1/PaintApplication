@@ -23,10 +23,14 @@ class Slider{
 	void display(){
 		value = constrain(value,min,max);
 		sideMenu.textAlign(LEFT, BOTTOM);
+		sideMenu.fill(255);
 		sideMenu.text(text + str(value),x,y);
 		sideMenu.rect(x,y, length,10);
 		sideMenu.fill(0);
 		sideMenu.ellipse(value, y+5, 10, 10);
+	}
+	void collide(){
+		
 	}
 
 }

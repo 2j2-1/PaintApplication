@@ -34,7 +34,7 @@ void draw(){
 		image(page,pageOffset[0],pageOffset[1]);
 		if (mousePressed){
 			page.beginDraw();
-			page.stroke(10);
+			page.stroke(brushColor);
 			page.strokeWeight(10);
 			page.line(mouseX-pageOffset[0],mouseY-pageOffset[1],pmouseX-pageOffset[0],pmouseY-pageOffset[1]);
 			page.endDraw();
@@ -52,6 +52,9 @@ void draw(){
 		processOption(menu.chosenOption);
 		menu.chosenOption = null;
 	}
+	if (mousePressed){
+		iD.collide(1);
+	}
 	
 	
 }
@@ -59,6 +62,7 @@ void draw(){
 void mouseClicked(){
 	if (!screenGrab){
 		menu.collide();
+		iD.collide(0);
 	}
 }
 
