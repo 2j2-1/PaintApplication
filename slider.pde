@@ -5,32 +5,44 @@ class Slider{
 	int y;
 	int length;
 	String text;
-	PGraphics window;
-	int value = 0;
+	int value;
 	int max;
 	int min;
+	boolean active = false;
 
-	Slider(int _x,int _y, int _length, String _text, PGraphics _window,int _min,int _max) {
+	Slider(int _x,int _y, int _length, String _text, int _min,int _max,int _value) {
 		x = _x;
 		y = _y;
 		length = _length;
 		text = _text + " ";
-		window = _window;
 		max = _max;
 		min = _min;
+		value = _value;
 	}
 
-	void display(){
-		value = constrain(value,min,max);
-		sideMenu.textAlign(LEFT, BOTTOM);
-		sideMenu.fill(255);
-		sideMenu.text(text + str(value),x,y);
-		sideMenu.rect(x,y, length,10);
-		sideMenu.fill(0);
-		sideMenu.ellipse(value, y+5, 10, 10);
-	}
-	void collide(){
+	void display(PGraphics s){
 		
+		s.textAlign(LEFT, BOTTOM);
+		s.fill(255);
+		s.text(text + str(value),x,y);
+		s.rect(x,y, length,10);
+		s.fill(0);
+		s.ellipse(map(value,min,max,0,s.width), y+5, 10, 10);
+		if (active){
+			value = int(map(mouseX,0,s.width,min,max));
+			value = constrain(value,min,max);
+		}
+		
+	}
+	void collide(PGraphics s){
+		if (mousePressed){
+			if (dist(int(map(mouseX,0,s.width,min,max)), mouseY-menu.menuHeight, value, y+5)<5){
+				active = true;
+			}
+		}
+		else {
+			active = false;
+		}
 	}
 
 }

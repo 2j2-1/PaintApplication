@@ -31,11 +31,10 @@ class menuBar{
 		if (active && menuBarOption<options.length){
 			displayOptions(menuBarOption);
 		}
-		
+
 	}
 
 	void collide(){
-
 		if (mouseY<=20 ){
 			active = !active;
 		}
@@ -73,73 +72,4 @@ class menuBar{
 		}
 	}
 	
-}
-
-void clearScreen(){
-	if (activePage){
-		page.beginDraw();
-		page.background(pageColor);
-		page.endDraw();
-	}
-}
-
-void newPage(int x,int y){
-	page = createGraphics(x, y);
-	page.beginDraw();
-	page.background(255);
-	page.endDraw();
-	pageOffset[0] = (width-page.width)/2;
-	pageOffset[1] =(height+menu.menuHeight-page.height)/2;
-}
-
-void processOption(String s){
-		switch (s) {
-			case "Save as":
-				if (activePage){
-	  				selectOutput("Select a folder to process:", "fileSelected");
-					break;
-				}
-			case "Save":
-				if (activePage){
-					if  (deafultSaveLocation!=null){
-						saveFile();
-					} else {
-						processOption("Save as");
-					}
-				}
-				break;
-			case "Clear":
-				clearScreen();
-				break;
-			case "New":
-				newPage(min(width,1900),min(correctedHeight,1000));
-				activePage = true;
-				break;
-			case "Delete":
-				page = null;
-				activePage = false;
-				break;
-			case "Drawing Menu":
-				if (activeMenu==1){
-					activeMenu = 0;
-				}
-				else {
-					activeMenu = 1;
-				}
-				break;
-			default:
-				println(s+" not yet implemented");
-				break;	
-		}
-	}
-void saveFile(){
-	page.save(deafultSaveLocation);
-}
-void fileSelected(File selection) {
-	if (selection == null) {
-		println("Window was closed or the user hit cancel.");
-	} else {
-		deafultSaveLocation = selection.getAbsolutePath();
-		page.save(deafultSaveLocation);
-	}
 }
