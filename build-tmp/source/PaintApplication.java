@@ -18,13 +18,13 @@ String[][] options = {{"File","New","Save","Save as","Delete"},{"Edit","Clear","
 int StrokeWeight = 10;
 menuBar menu;
 imageDrawing iD;
+Undo undo;
 int activeMenu = 0;
 
 boolean activePage = false;
 PGraphics page;
 PGraphics sideMenu;
 PGraphics backGround;
-ArrayList<PImage> pageBuffer= new ArrayList<PImage>();
 String deafultSaveLocation = null;
 
 int correctedHeight;
@@ -37,7 +37,7 @@ int drawY = 500;
 int textSize = 16;
 
 int drawingType = 0;
-int undoDepth = 0;
+
 int[] clickStart = {-1,-1};
 ArrayList<int[]> points = new ArrayList<int[]>();
 
@@ -51,6 +51,7 @@ public void setup(){
 	iD = new imageDrawing(0,menu.menuHeight);
 	correctedHeight = height - menu.menuHeight;
 	sideMenu = createGraphics(iD.menuWidth,correctedHeight);
+	undo = new Undo();
 
 }
 
@@ -84,18 +85,15 @@ public void mouseClicked(){
 	}
 	else if (mouseButton == RIGHT){
 		points.clear();
-		undoDepth-=1;
-		page.beginDraw();
-		page.image(pageBuffer.get(undoDepth),0,0);
-		page.endDraw();
-		removeUndo();
+		undo.rollBack();
+		undo.removeUndo();
 		// drawingType = 0;
 	}
 }
 
 public void mouseReleased(){
 	if (pageCollide(mouseX,mouseY) || pageCollide(clickStart[0],clickStart[1])){
-		addUndo();
+		undo.addUndo();
 	}
 	clickStart[0] = -1;
 	clickStart[1] = -1;
@@ -115,32 +113,7 @@ public boolean pageEquals(PImage x,PImage y){
 	return true;
 }
 
-public void addUndo(){
-	if (activePage){
-		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
-		if (undoDepth<pageBuffer.size()-1){
-			for (int i = undoDepth-1; i < pageBuffer.size(); i++) {
-				if (i>0){
-					pageBuffer.remove(i);
-				}
-			}
-			undoDepth-=1;
-		}
 
-
-		else if (!pageEquals(pageBuffer.get(pageBuffer.size()-1),page.get())){
-			pageBuffer.add(page.get());
-			undoDepth+=1;
-
-		}
-	}
-}
-
-public void removeUndo(){
-	if (activePage){
-		pageBuffer.remove(pageBuffer.size()-1);
-	}
-}
 
 public boolean pageCollide(int mouseX,int mouseY){
 	if (activePage && !menu.active){
@@ -174,6 +147,9 @@ public void displayPage(){
 		backGround.image(page,0,0);
 		backGround.endDraw();
 		image(backGround,pageOffset[0],pageOffset[1]);
+		for (int i = 0; i < undo.pageBuffer.size(); ++i) {
+			image(undo.pageBuffer.get(i), 100, i*100,100,100);
+		}
 	
 	}
 }
@@ -227,9 +203,8 @@ public void polygon(boolean fill){
 	if (points.size() > 0){
 
 		page.beginDraw();
-		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
-		page.image(pageBuffer.get(undoDepth),0,0);
-		// pageBuffer.remove(pageBuffer.size()-1);
+		undo.rollBack();
+		
 		page.noFill();
 		page.stroke(brushColor);
 		page.strokeWeight(StrokeWeight);
@@ -243,7 +218,6 @@ public void polygon(boolean fill){
 		}	else{
 			page.endShape(CLOSE);
 		}
-		// page.line(points.get()[0],points.get(i)[0],mouseX-pageOffset[0],mouseY-pageOffset[1]);
 		page.endDraw();
 
 	}
@@ -442,11 +416,11 @@ public void processOption(String s){
 				}
 				break;
 			case "Undo":
-				undoRedo(-1);
+				undo.undoRedo(-1);
 				break;
 
 			case "Redo":
-				undoRedo(1);
+				undo.undoRedo(1);
 				break;
 
 			default:
@@ -455,15 +429,7 @@ public void processOption(String s){
 		}
 	}
 
-public void undoRedo(int direction){
-	undoDepth += direction;
-	undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
-	// pageBuffer.remove(pageBuffer.size()-1);
-	page.beginDraw();
-	page.image(pageBuffer.get(undoDepth),0,0);
-	page.endDraw();
-	displayPage();	
-}
+
 
 public void clearPage(){
 	if (activePage){
@@ -487,9 +453,8 @@ public void newPage(int x,int y){
 	pageOffset[0] = (width-page.width)/2;
 	pageOffset[1] = (height+menu.menuHeight-page.height)/2;
 	pageWidth = x;
-	pageBuffer.clear();
-	pageBuffer.add(page.get());
-	undoDepth = 0;
+	undo.reset();
+
 }
 
 
@@ -499,7 +464,8 @@ public void saveFile(){
 public void fileSelected(File selection) {
 	if (selection == null) {
 		println("Window was closed or the user hit cancel.");
-	} else {
+	} 
+	else {
 		deafultSaveLocation = selection.getAbsolutePath();
 		page.save(deafultSaveLocation);
 	}
@@ -552,6 +518,74 @@ class Slider{
 	}
 
 }
+class Undo {
+
+	ArrayList<PImage> pageBuffer= new ArrayList<PImage>();
+	int undoDepth = 0;
+	int undoLimit = pageBuffer.size();
+
+	public Undo () {
+		
+	}
+
+	public void addPage(){
+		println("Undobuffer now at", pageBuffer.size());
+		pageBuffer.add(page.get());
+		undoDepth+=1;
+	}
+
+	public void reset(){
+		println("Reset");
+		pageBuffer.clear();
+		addPage();
+		undoDepth=0;
+	}
+
+	public void rollBack(){
+		println("Roll");
+		page.beginDraw();
+		page.clear();
+		page.image(pageBuffer.get(undoDepth),0,0);
+		page.endDraw();
+	}
+
+	public void addUndo(){
+	println("addUndo");
+	if (activePage){
+		if (undoDepth<pageBuffer.size()-1){
+			int temp = pageBuffer.size()-1;
+			for (int i = undoDepth; i < temp; i++) {
+				pageBuffer.remove(pageBuffer.size()-1);
+			}
+		}
+
+
+		// if (!pageEquals(pageBuffer.get(pageBuffer.size()-1),page.get())){
+			addPage();
+			
+			// }
+		}
+	}
+
+	public void removeUndo(){
+		println("removeundo");
+		if (activePage){
+			pageBuffer.remove(pageBuffer.size()-1);
+		}
+	}
+
+	public void undoRedo(int direction){
+		println("undoredo",direction);
+		undoDepth += direction;
+		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
+		println(undoDepth);
+		rollBack();
+		displayPage();	
+	}
+
+}
+
+
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "--present", "--window-color=#666666", "--hide-stop", "PaintApplication" };
     if (passedArgs != null) {

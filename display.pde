@@ -6,6 +6,9 @@ void displayPage(){
 		backGround.image(page,0,0);
 		backGround.endDraw();
 		image(backGround,pageOffset[0],pageOffset[1]);
+		for (int i = 0; i < undo.pageBuffer.size(); ++i) {
+			image(undo.pageBuffer.get(i), 100, i*100,100,100);
+		}
 	
 	}
 }

@@ -35,11 +35,11 @@ void processOption(String s){
 				}
 				break;
 			case "Undo":
-				undoRedo(-1);
+				undo.undoRedo(-1);
 				break;
 
 			case "Redo":
-				undoRedo(1);
+				undo.undoRedo(1);
 				break;
 
 			default:
@@ -48,15 +48,7 @@ void processOption(String s){
 		}
 	}
 
-void undoRedo(int direction){
-	undoDepth += direction;
-	undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
-	// pageBuffer.remove(pageBuffer.size()-1);
-	page.beginDraw();
-	page.image(pageBuffer.get(undoDepth),0,0);
-	page.endDraw();
-	displayPage();	
-}
+
 
 void clearPage(){
 	if (activePage){
@@ -80,9 +72,8 @@ void newPage(int x,int y){
 	pageOffset[0] = (width-page.width)/2;
 	pageOffset[1] = (height+menu.menuHeight-page.height)/2;
 	pageWidth = x;
-	pageBuffer.clear();
-	pageBuffer.add(page.get());
-	undoDepth = 0;
+	undo.reset();
+
 }
 
 
@@ -92,7 +83,8 @@ void saveFile(){
 void fileSelected(File selection) {
 	if (selection == null) {
 		println("Window was closed or the user hit cancel.");
-	} else {
+	} 
+	else {
 		deafultSaveLocation = selection.getAbsolutePath();
 		page.save(deafultSaveLocation);
 	}

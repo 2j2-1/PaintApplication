@@ -33,9 +33,8 @@ void polygon(boolean fill){
 	if (points.size() > 0){
 
 		page.beginDraw();
-		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
-		page.image(pageBuffer.get(undoDepth),0,0);
-		// pageBuffer.remove(pageBuffer.size()-1);
+		undo.rollBack();
+		
 		page.noFill();
 		page.stroke(brushColor);
 		page.strokeWeight(StrokeWeight);
@@ -49,7 +48,6 @@ void polygon(boolean fill){
 		}	else{
 			page.endShape(CLOSE);
 		}
-		// page.line(points.get()[0],points.get(i)[0],mouseX-pageOffset[0],mouseY-pageOffset[1]);
 		page.endDraw();
 
 	}
