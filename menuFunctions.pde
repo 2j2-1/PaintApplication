@@ -49,31 +49,38 @@ void processOption(String s){
 	}
 
 void undoRedo(int direction){
-	undoDepth+=direction;
+	undoDepth += direction;
+	undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
 	// pageBuffer.remove(pageBuffer.size()-1);
 	page.beginDraw();
 	page.image(pageBuffer.get(undoDepth),0,0);
 	page.endDraw();
-	displayPage();
-	
+	displayPage();	
 }
+
 void clearPage(){
 	if (activePage){
 		page.beginDraw();
 		page.background(pageColor);
 		page.endDraw();
+		backGround.beginDraw();
+		backGround.background(pageColor);
+		backGround.endDraw();
 	}
 }
 
 void newPage(int x,int y){
 	page = createGraphics(x, y);
-	temp = createGraphics(x, y);
+	backGround = createGraphics(x, y);
+	backGround.beginDraw();
+	backGround.background(pageColor);
+	backGround.endDraw();
 	page.beginDraw();
-	page.background(255);
 	page.endDraw();
 	pageOffset[0] = (width-page.width)/2;
 	pageOffset[1] = (height+menu.menuHeight-page.height)/2;
 	pageWidth = x;
+	pageBuffer.clear();
 	pageBuffer.add(page.get());
 	undoDepth = 0;
 }

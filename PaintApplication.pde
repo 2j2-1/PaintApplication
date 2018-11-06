@@ -7,7 +7,7 @@ int activeMenu = 0;
 boolean activePage = false;
 PGraphics page;
 PGraphics sideMenu;
-PGraphics temp;
+PGraphics backGround;
 ArrayList<PImage> pageBuffer= new ArrayList<PImage>();
 String deafultSaveLocation = null;
 
@@ -20,10 +20,9 @@ int drawY = 500;
 
 int textSize = 16;
 
-int drawingType = 1;
+int drawingType = 0;
 int undoDepth = 0;
-int undoLimit = 10;
-
+int[] clickStart = {-1,-1};
 ArrayList<int[]> points = new ArrayList<int[]>();
 
 void settings(){
@@ -43,17 +42,18 @@ void draw(){
 	background(backgroundColor);
 	displayPage();
 	displaySideMenu(sideMenu);
-	
-	
-
 	menu.display();
+
 	if (menu.chosenOption!=null){
 		processOption(menu.chosenOption);
 		menu.chosenOption = null;
 	}
 	iD.collide(sideMenu);
-	println(undoDepth,pageBuffer.size());
-	pageCollide();
+	// pageCollide(mouse);
+	if (mousePressed && clickStart[0]==-1 && clickStart[1]==-1){
+		clickStart[0] = mouseX;
+		clickStart[1] = mouseY;
+	}
 }
 
 void mouseClicked(){
@@ -61,7 +61,7 @@ void mouseClicked(){
 		if (!screenGrab){
 			menu.collide();
 			iD.collide(sideMenu);
-			if (pageCollide()){
+			if (pageCollide(mouseX,mouseY)){
 				addPoint();
 			}
 		}
@@ -78,9 +78,11 @@ void mouseClicked(){
 }
 
 void mouseReleased(){
-	if (pageCollide()){
+	if (pageCollide(mouseX,mouseY) || pageCollide(clickStart[0],clickStart[1])){
 		addUndo();
 	}
+	clickStart[0] = -1;
+	clickStart[1] = -1;
 }
 
 boolean pageEquals(PImage x,PImage y){
@@ -99,7 +101,18 @@ boolean pageEquals(PImage x,PImage y){
 
 void addUndo(){
 	if (activePage){
-		if (!pageEquals(pageBuffer.get(pageBuffer.size()-1),page.get())){
+		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
+		if (undoDepth<pageBuffer.size()-1){
+			for (int i = undoDepth-1; i < pageBuffer.size(); i++) {
+				if (i>0){
+					pageBuffer.remove(i);
+				}
+			}
+			undoDepth-=1;
+		}
+
+
+		else if (!pageEquals(pageBuffer.get(pageBuffer.size()-1),page.get())){
 			pageBuffer.add(page.get());
 			undoDepth+=1;
 
@@ -113,7 +126,7 @@ void removeUndo(){
 	}
 }
 
-boolean pageCollide(){
+boolean pageCollide(int mouseX,int mouseY){
 	if (activePage && !menu.active){
 		return (mouseX>pageOffset[0] && mouseX<pageOffset[0]+drawX && mouseY>pageOffset[1] && mouseY<pageOffset[1]+drawY);
 	}

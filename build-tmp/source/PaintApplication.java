@@ -23,7 +23,7 @@ int activeMenu = 0;
 boolean activePage = false;
 PGraphics page;
 PGraphics sideMenu;
-PGraphics temp;
+PGraphics backGround;
 ArrayList<PImage> pageBuffer= new ArrayList<PImage>();
 String deafultSaveLocation = null;
 
@@ -36,10 +36,9 @@ int drawY = 500;
 
 int textSize = 16;
 
-int drawingType = 1;
+int drawingType = 0;
 int undoDepth = 0;
-int undoLimit = 10;
-
+int[] clickStart = {-1,-1};
 ArrayList<int[]> points = new ArrayList<int[]>();
 
 public void settings(){
@@ -59,17 +58,18 @@ public void draw(){
 	background(backgroundColor);
 	displayPage();
 	displaySideMenu(sideMenu);
-	
-	
-
 	menu.display();
+
 	if (menu.chosenOption!=null){
 		processOption(menu.chosenOption);
 		menu.chosenOption = null;
 	}
 	iD.collide(sideMenu);
-	println(undoDepth,pageBuffer.size());
-	pageCollide();
+	// pageCollide(mouse);
+	if (mousePressed && clickStart[0]==-1 && clickStart[1]==-1){
+		clickStart[0] = mouseX;
+		clickStart[1] = mouseY;
+	}
 }
 
 public void mouseClicked(){
@@ -77,7 +77,7 @@ public void mouseClicked(){
 		if (!screenGrab){
 			menu.collide();
 			iD.collide(sideMenu);
-			if (pageCollide()){
+			if (pageCollide(mouseX,mouseY)){
 				addPoint();
 			}
 		}
@@ -94,9 +94,11 @@ public void mouseClicked(){
 }
 
 public void mouseReleased(){
-	if (pageCollide()){
+	if (pageCollide(mouseX,mouseY) || pageCollide(clickStart[0],clickStart[1])){
 		addUndo();
 	}
+	clickStart[0] = -1;
+	clickStart[1] = -1;
 }
 
 public boolean pageEquals(PImage x,PImage y){
@@ -115,7 +117,18 @@ public boolean pageEquals(PImage x,PImage y){
 
 public void addUndo(){
 	if (activePage){
-		if (!pageEquals(pageBuffer.get(pageBuffer.size()-1),page.get())){
+		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
+		if (undoDepth<pageBuffer.size()-1){
+			for (int i = undoDepth-1; i < pageBuffer.size(); i++) {
+				if (i>0){
+					pageBuffer.remove(i);
+				}
+			}
+			undoDepth-=1;
+		}
+
+
+		else if (!pageEquals(pageBuffer.get(pageBuffer.size()-1),page.get())){
 			pageBuffer.add(page.get());
 			undoDepth+=1;
 
@@ -129,7 +142,7 @@ public void removeUndo(){
 	}
 }
 
-public boolean pageCollide(){
+public boolean pageCollide(int mouseX,int mouseY){
 	if (activePage && !menu.active){
 		return (mouseX>pageOffset[0] && mouseX<pageOffset[0]+drawX && mouseY>pageOffset[1] && mouseY<pageOffset[1]+drawY);
 	}
@@ -156,8 +169,12 @@ int brushColor = color(0);
 public void displayPage(){
 	if(activePage){
 		drawPage(drawingType);
-		image(page,pageOffset[0],pageOffset[1]);
-		image(temp,pageOffset[0],pageOffset[1]);
+		backGround.beginDraw();
+		backGround.background(pageColor);
+		backGround.image(page,0,0);
+		backGround.endDraw();
+		image(backGround,pageOffset[0],pageOffset[1]);
+	
 	}
 }
 
@@ -166,7 +183,7 @@ public void displayPage(){
 public void displaySideMenu(PGraphics sidemenu){
 	if (activeMenu>0){
 		pageOffset[0] = (width-pageWidth+iD.menuWidth)/2;
-	}	else{
+	} else {
 		pageOffset[0] = (width-pageWidth)/2;
 	}
 	switch (activeMenu) {
@@ -210,6 +227,7 @@ public void polygon(boolean fill){
 	if (points.size() > 0){
 
 		page.beginDraw();
+		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
 		page.image(pageBuffer.get(undoDepth),0,0);
 		// pageBuffer.remove(pageBuffer.size()-1);
 		page.noFill();
@@ -247,8 +265,8 @@ class imageDrawing{
 	int menuWidth = 200;
 	int spacing = 30;
 	boolean displayMenu = false;
-	Slider brightnessS = new Slider(0,spacing*2+menuWidth,menuWidth,"Brightness:",0,100,10);
-	Slider brushSize = new Slider(0,spacing*3+menuWidth,menuWidth,"BrushSize:",0,300,StrokeWeight);
+	Slider brightnessS = new Slider(0,spacing*2+menuWidth,menuWidth,"Brightness:",0,100,100);
+	Slider brushSize = new Slider(0,spacing*3+menuWidth,menuWidth,"BrushSize:",0,200,StrokeWeight);
 	imageDrawing(int _x, int _y) {
 		xoff = _x;
 		yoff = _y;
@@ -256,7 +274,7 @@ class imageDrawing{
 
 	public void display(PGraphics sM){
 		sM.beginDraw();
-		sM.translate(0,20);
+		// sM.translate(0,20);
 		sM.noStroke();
 		sM.fill(menuFill);
 		sM.rect(0,0,menuWidth,height);
@@ -270,7 +288,7 @@ class imageDrawing{
 		colorMode(HSB, 100);
 		for (int x = 0; x < menuWidth; x++){
 			for (int y = 0; y < menuWidth; y++){
-				sM.pixels[x + (y+spacing+yoff)*menuWidth] = color(map(x,0,menuWidth,0,100),map(y,0,menuWidth,0,100),brightnessS.value);
+				sM.pixels[x + (y+spacing)*menuWidth] = color(map(x,0,menuWidth,0,100),map(y,0,menuWidth,0,100),brightnessS.value);
 			}
 		}
 		sM.updatePixels();
@@ -280,13 +298,16 @@ class imageDrawing{
 		
 		sM.endDraw();
 
+		if (brushSize.active){
+			showStroke();
+		}
 		
-		image(sM,xoff,0,menuWidth,sM.height);
+		image(sM,xoff,yoff,menuWidth,sM.height);
 	}
 
 	public void collide(PGraphics sM){
 		if (mousePressed){
-			if (mouseX<menuWidth && mouseY>spacing && mouseY<spacing+menuWidth && activeMenu == 1){
+			if (mouseX<menuWidth && mouseY>spacing+yoff && mouseY<spacing+menuWidth+yoff && activeMenu == 1){
 				updateColor();
 			}
 		}
@@ -296,10 +317,16 @@ class imageDrawing{
 	}
 
 	public void updateColor(){
-		brushColor = color(map(mouseX,0,menuWidth,0,100),brightnessS.value,map(mouseY-yoff-spacing,0,menuWidth,0,100));
+		brushColor = color(map(mouseX,0,menuWidth,0,100),map(mouseY,spacing+yoff,menuWidth+spacing+yoff,0,100),brightnessS.value);
+		showStroke();
+	}
+
+	public void showStroke(){
 		fill(brushColor);
-		stroke(1);
-		ellipse(mouseX, mouseY, 10, 10);
+		colorMode(RGB);
+		stroke(brushColor);
+		// strokeWeight(1);
+		ellipse(width-100,100+yoff, StrokeWeight,StrokeWeight);
 		noStroke();
 	}
 }
@@ -429,31 +456,38 @@ public void processOption(String s){
 	}
 
 public void undoRedo(int direction){
-	undoDepth+=direction;
+	undoDepth += direction;
+	undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
 	// pageBuffer.remove(pageBuffer.size()-1);
 	page.beginDraw();
 	page.image(pageBuffer.get(undoDepth),0,0);
 	page.endDraw();
-	displayPage();
-	
+	displayPage();	
 }
+
 public void clearPage(){
 	if (activePage){
 		page.beginDraw();
 		page.background(pageColor);
 		page.endDraw();
+		backGround.beginDraw();
+		backGround.background(pageColor);
+		backGround.endDraw();
 	}
 }
 
 public void newPage(int x,int y){
 	page = createGraphics(x, y);
-	temp = createGraphics(x, y);
+	backGround = createGraphics(x, y);
+	backGround.beginDraw();
+	backGround.background(pageColor);
+	backGround.endDraw();
 	page.beginDraw();
-	page.background(255);
 	page.endDraw();
 	pageOffset[0] = (width-page.width)/2;
 	pageOffset[1] = (height+menu.menuHeight-page.height)/2;
 	pageWidth = x;
+	pageBuffer.clear();
 	pageBuffer.add(page.get());
 	undoDepth = 0;
 }

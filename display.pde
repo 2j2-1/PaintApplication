@@ -1,8 +1,12 @@
 void displayPage(){
 	if(activePage){
 		drawPage(drawingType);
-		image(page,pageOffset[0],pageOffset[1]);
-		image(temp,pageOffset[0],pageOffset[1]);
+		backGround.beginDraw();
+		backGround.background(pageColor);
+		backGround.image(page,0,0);
+		backGround.endDraw();
+		image(backGround,pageOffset[0],pageOffset[1]);
+	
 	}
 }
 
@@ -11,7 +15,7 @@ void displayPage(){
 void displaySideMenu(PGraphics sidemenu){
 	if (activeMenu>0){
 		pageOffset[0] = (width-pageWidth+iD.menuWidth)/2;
-	}	else{
+	} else {
 		pageOffset[0] = (width-pageWidth)/2;
 	}
 	switch (activeMenu) {

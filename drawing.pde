@@ -33,6 +33,7 @@ void polygon(boolean fill){
 	if (points.size() > 0){
 
 		page.beginDraw();
+		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
 		page.image(pageBuffer.get(undoDepth),0,0);
 		// pageBuffer.remove(pageBuffer.size()-1);
 		page.noFill();
