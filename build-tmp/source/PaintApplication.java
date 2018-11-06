@@ -36,7 +36,7 @@ int drawY = 500;
 
 int textSize = 16;
 
-int drawingType = 0;
+int drawingType = 1;
 
 int[] clickStart = {-1,-1};
 ArrayList<int[]> points = new ArrayList<int[]>();
@@ -86,6 +86,8 @@ public void mouseClicked(){
 	else if (mouseButton == RIGHT){
 		points.clear();
 		undo.rollBack();
+		undo.rollBack();
+		undo.removeUndo();
 		undo.removeUndo();
 		// drawingType = 0;
 	}
@@ -175,14 +177,44 @@ public void drawPage(int drawingType){
 			painting();
 			break;
 		case 1:
+			shape(2);
+
+	}
+
+}
+
+public void shape(int mode){
+	if (points.size() > 0){
+		if (mouseX-pageOffset[0]!=pmouseX-pageOffset[0]||mouseY-pageOffset[1]!=pmouseY-pageOffset[1]){
+			undo.rollBack();
+			page.beginDraw();
+			page.stroke(brushColor);
+			page.strokeWeight(StrokeWeight);
+			// page.noFill();
+			chooseShape(mode);
+			page.endDraw();
+		    undo.addUndo();
+		}
+	}
+}
+
+public void chooseShape(int mode){
+	switch (mode) {
+		case 0:
+			page.rect(points.get(0)[0],points.get(0)[1],mouseX-pageOffset[0]-points.get(0)[0],mouseY-pageOffset[1]-points.get(0)[1]);
+			break;
+		case 1:
 			polygon(false);
 			break;
 		case 2:
 			polygon(true);
 			break;
+		// case 3:
+
+
 
 	}
-
+	
 }
 
 public void painting(){
@@ -199,28 +231,19 @@ public void painting(){
 }
 
 public void polygon(boolean fill){
-
-	if (points.size() > 0){
-
-		page.beginDraw();
-		undo.rollBack();
-		
-		page.noFill();
-		page.stroke(brushColor);
-		page.strokeWeight(StrokeWeight);
 		page.beginShape();
 		for (int i = 0; i < points.size(); i++) {
 			page.vertex(points.get(i)[0],points.get(i)[1]);
 		}
 		page.vertex(mouseX-pageOffset[0],mouseY-pageOffset[1]);
+
 		if (!fill){
 			page.endShape();
-		}	else{
+		}	
+		else{
 			page.endShape(CLOSE);
 		}
-		page.endDraw();
 
-	}
 }
 
 public void addPoint(){
@@ -529,28 +552,28 @@ class Undo {
 	}
 
 	public void addPage(){
-		println("Undobuffer now at", pageBuffer.size());
 		pageBuffer.add(page.get());
 		undoDepth+=1;
 	}
 
 	public void reset(){
-		println("Reset");
 		pageBuffer.clear();
 		addPage();
 		undoDepth=0;
 	}
 
 	public void rollBack(){
-		println("Roll");
-		page.beginDraw();
-		page.clear();
-		page.image(pageBuffer.get(undoDepth),0,0);
-		page.endDraw();
+		if (undoDepth>0){
+			undoDepth--;
+			page.beginDraw();
+			page.clear();
+			page.image(pageBuffer.get(undoDepth),0,0);
+			page.endDraw();
+
+		}
 	}
 
 	public void addUndo(){
-	println("addUndo");
 	if (activePage){
 		if (undoDepth<pageBuffer.size()-1){
 			int temp = pageBuffer.size()-1;
@@ -568,14 +591,12 @@ class Undo {
 	}
 
 	public void removeUndo(){
-		println("removeundo");
 		if (activePage){
 			pageBuffer.remove(pageBuffer.size()-1);
 		}
 	}
 
 	public void undoRedo(int direction){
-		println("undoredo",direction);
 		undoDepth += direction;
 		undoDepth = constrain(undoDepth, 0, pageBuffer.size()-1);
 		println(undoDepth);

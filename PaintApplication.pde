@@ -20,7 +20,7 @@ int drawY = 500;
 
 int textSize = 16;
 
-int drawingType = 0;
+int drawingType = 1;
 
 int[] clickStart = {-1,-1};
 ArrayList<int[]> points = new ArrayList<int[]>();
@@ -70,6 +70,8 @@ void mouseClicked(){
 	else if (mouseButton == RIGHT){
 		points.clear();
 		undo.rollBack();
+		undo.rollBack();
+		undo.removeUndo();
 		undo.removeUndo();
 		// drawingType = 0;
 	}
