@@ -58,6 +58,7 @@ void clearPage(){
 		backGround.beginDraw();
 		backGround.background(pageColor);
 		backGround.endDraw();
+		undo.undoDepth=0;
 	}
 }
 
