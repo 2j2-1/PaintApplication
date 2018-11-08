@@ -5,20 +5,22 @@ void drawPage(int drawingType){
 			painting();
 			break;
 		case 1:
-			shape(2);
+			shape(4,false);
 
 	}
 
 }
 
-void shape(int mode){
+void shape(int mode,boolean fill){
 	if (points.size() > 0){
 		if (mouseX-pageOffset[0]!=pmouseX-pageOffset[0]||mouseY-pageOffset[1]!=pmouseY-pageOffset[1]){
 			undo.rollBack();
 			page.beginDraw();
 			page.stroke(brushColor);
 			page.strokeWeight(StrokeWeight);
-			// page.noFill();
+			if (!fill){
+			page.noFill();
+			}
 			chooseShape(mode);
 			page.endDraw();
 		    undo.addUndo();
@@ -27,9 +29,11 @@ void shape(int mode){
 }
 
 void chooseShape(int mode){
+	int correctedX = mouseX-pageOffset[0];
+	int correctedY = mouseY-pageOffset[1];
 	switch (mode) {
 		case 0:
-			page.rect(points.get(0)[0],points.get(0)[1],mouseX-pageOffset[0]-points.get(0)[0],mouseY-pageOffset[1]-points.get(0)[1]);
+			page.rect(points.get(0)[0],points.get(0)[1],correctedX-points.get(0)[0],correctedY-points.get(0)[1]);
 			break;
 		case 1:
 			polygon(false);
@@ -37,7 +41,11 @@ void chooseShape(int mode){
 		case 2:
 			polygon(true);
 			break;
-		// case 3:
+		case 3:
+			page.triangle((points.get(0)[0]+correctedX)/2,points.get(0)[1],points.get(0)[0],correctedY,correctedX,correctedY);
+			break;
+		case 4:
+			page.ellipse(points.get(0)[0],points.get(0)[1], dist(points.get(0)[0],points.get(0)[1],correctedX,correctedY)*2, dist(points.get(0)[0],points.get(0)[1],correctedX,correctedY)*2);
 
 
 
