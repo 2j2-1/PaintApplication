@@ -5,9 +5,16 @@ class imageDrawing{
 	int yoff;
 	int menuWidth = 200;
 	int spacing = 30;
+	int buttonSize = menuWidth/5;
 	boolean displayMenu = false;
-	Slider brightnessS = new Slider(0,spacing*2+menuWidth,menuWidth,"Brightness:",0,100,100);
-	Slider brushSize = new Slider(0,spacing*3+menuWidth,menuWidth,"BrushSize:",0,200,StrokeWeight);
+	int yLocation = spacing+menuWidth;
+	Slider brightnessS = new Slider(0,setYLocation(spacing),menuWidth,"Brightness:",0,100,100);
+	Slider brushSize = new Slider(0,setYLocation(spacing),menuWidth,"BrushSize:",0,200,StrokeWeight);
+	Button brush = new Button(0,setYLocation(spacing),buttonSize,buttonSize);
+	Button rectangle = new Button(buttonSize,brush.y,buttonSize,buttonSize);
+	Button poly = new Button(buttonSize*2,brush.y,buttonSize,buttonSize);
+	Button circle = new Button(buttonSize*3,brush.y,buttonSize,buttonSize);
+	Button tri = new Button(buttonSize*4,brush.y,buttonSize,buttonSize);
 	imageDrawing(int _x, int _y) {
 		xoff = _x;
 		yoff = _y;
@@ -36,17 +43,27 @@ class imageDrawing{
 
 		brightnessS.display(sM);
 		brushSize.display(sM);
-		
+		brush.display(sM);
+		rectangle.display(sM);
+		poly.display(sM);
+		circle.display(sM);
+		tri.display(sM);
+		brush.collide();
+		rectangle.collide();
+		poly.collide();
+		circle.collide();
+		tri.collide();
 		sM.endDraw();
 
 		if (brushSize.active){
 			showStroke();
 		}
+
 		
 		image(sM,xoff,yoff,menuWidth,sM.height);
 	}
 
-	void collide(PGraphics sM){
+	void collide(PGraphics sM,int mode){
 		if (mousePressed){
 			if (mouseX<menuWidth && mouseY>spacing+yoff && mouseY<spacing+menuWidth+yoff && activeMenu == 1){
 				updateColor();
@@ -55,6 +72,33 @@ class imageDrawing{
 		brushSize.collide(sM);
 		brightnessS.collide(sM);
 		StrokeWeight = brushSize.value;
+		if (mode == 1){
+			updateDrawType();
+		}
+
+	}
+
+	void updateDrawType(){
+		if(brush.collide()){
+			drawingType = 0;
+		}
+		else if(rectangle.collide()){
+			drawingType = 1;
+			shapeType = 0;
+		}
+		else if(poly.collide()){
+			drawingType = 1;
+			shapeType = 1;
+		}
+		else if(tri.collide()){
+			drawingType = 1;
+			shapeType = 2;
+		}
+		else if(circle.collide()){
+			drawingType = 1;
+			shapeType = 3;
+		}
+		
 	}
 
 	void updateColor(){
@@ -69,5 +113,10 @@ class imageDrawing{
 		// strokeWeight(1);
 		ellipse(width-100,100+yoff, StrokeWeight,StrokeWeight);
 		noStroke();
+	}
+
+	int setYLocation(int size){
+		yLocation += size;
+		return yLocation;
 	}
 }

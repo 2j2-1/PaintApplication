@@ -37,13 +37,14 @@ int drawY = 500;
 int textSize = 16;
 
 int drawingType = 1;
+int shapeType = 0;
 
 int[] clickStart = {-1,-1};
 ArrayList<int[]> points = new ArrayList<int[]>();
 
 public void settings(){
-	fullScreen();
-	// size(640,640);
+	// fullScreen();
+	size(640,640);
 }
 public void setup(){
 	menu = new menuBar();
@@ -65,7 +66,7 @@ public void draw(){
 		processOption(menu.chosenOption);
 		menu.chosenOption = null;
 	}
-	iD.collide(sideMenu);
+	iD.collide(sideMenu,0);
 	// pageCollide(mouse);
 	if (mousePressed && clickStart[0]==-1 && clickStart[1]==-1){
 		clickStart[0] = mouseX;
@@ -77,7 +78,7 @@ public void mouseClicked(){
 	if (mouseButton == LEFT){
 		if (!screenGrab){
 			menu.collide();
-			iD.collide(sideMenu);
+			iD.collide(sideMenu,1);
 			if (pageCollide(mouseX,mouseY)){
 				addPoint();
 			}
@@ -130,6 +131,29 @@ public boolean pageCollide(int mouseX,int mouseY){
 // float rmouseY(PGraphics window){
 // 	return mouseY - window.yoff;
 // }
+class Button{
+	int x;
+	int y;
+	int sizeX;
+	int sizeY;
+
+	Button(int _x, int _y, int _sizeX, int _sizeY){
+		x = _x;
+		y = _y;
+		sizeX = _sizeX;
+		sizeY = _sizeY;
+	}
+
+	public void display(PGraphics window){
+		window.fill(buttonFill);
+		window.rect(x,y,sizeX,sizeY);
+	}
+
+	public boolean collide(){
+		return (x<=mouseX&&x+sizeX>=mouseX&&y<mouseY-menu.menuHeight&&y>mouseY-menu.menuHeight-sizeY);
+	}
+
+}
 // Main windows background color
 int backgroundColor = color(100);
 
@@ -141,6 +165,9 @@ int menuText = color(255);
 //Page Color
 int pageColor = color(255);
 int brushColor = color(0);
+
+//Button
+int buttonFill = color(40);
 public void displayPage(){
 	if(activePage){
 		drawPage(drawingType);
@@ -177,20 +204,22 @@ public void drawPage(int drawingType){
 			painting();
 			break;
 		case 1:
-			shape(2);
+			shape(shapeType,false);
 
 	}
 
 }
 
-public void shape(int mode){
+public void shape(int mode,boolean fill){
 	if (points.size() > 0){
 		if (mouseX-pageOffset[0]!=pmouseX-pageOffset[0]||mouseY-pageOffset[1]!=pmouseY-pageOffset[1]){
 			undo.rollBack();
 			page.beginDraw();
 			page.stroke(brushColor);
 			page.strokeWeight(StrokeWeight);
-			// page.noFill();
+			if (!fill){
+			page.noFill();
+			}
 			chooseShape(mode);
 			page.endDraw();
 		    undo.addUndo();
@@ -199,18 +228,21 @@ public void shape(int mode){
 }
 
 public void chooseShape(int mode){
+	int correctedX = mouseX-pageOffset[0];
+	int correctedY = mouseY-pageOffset[1];
 	switch (mode) {
 		case 0:
-			page.rect(points.get(0)[0],points.get(0)[1],mouseX-pageOffset[0]-points.get(0)[0],mouseY-pageOffset[1]-points.get(0)[1]);
+			page.rect(points.get(0)[0],points.get(0)[1],correctedX-points.get(0)[0],correctedY-points.get(0)[1]);
 			break;
 		case 1:
 			polygon(false);
 			break;
 		case 2:
-			polygon(true);
+			page.triangle((points.get(0)[0]+correctedX)/2,points.get(0)[1],points.get(0)[0],correctedY,correctedX,correctedY);
 			break;
-		// case 3:
-
+		case 3:
+			page.ellipse(points.get(0)[0],points.get(0)[1], dist(points.get(0)[0],points.get(0)[1],correctedX,correctedY)*2, dist(points.get(0)[0],points.get(0)[1],correctedX,correctedY)*2);
+			break;
 
 
 	}
@@ -261,9 +293,16 @@ class imageDrawing{
 	int yoff;
 	int menuWidth = 200;
 	int spacing = 30;
+	int buttonSize = menuWidth/5;
 	boolean displayMenu = false;
-	Slider brightnessS = new Slider(0,spacing*2+menuWidth,menuWidth,"Brightness:",0,100,100);
-	Slider brushSize = new Slider(0,spacing*3+menuWidth,menuWidth,"BrushSize:",0,200,StrokeWeight);
+	int yLocation = spacing+menuWidth;
+	Slider brightnessS = new Slider(0,setYLocation(spacing),menuWidth,"Brightness:",0,100,100);
+	Slider brushSize = new Slider(0,setYLocation(spacing),menuWidth,"BrushSize:",0,200,StrokeWeight);
+	Button brush = new Button(0,setYLocation(spacing),buttonSize,buttonSize);
+	Button rectangle = new Button(buttonSize,brush.y,buttonSize,buttonSize);
+	Button poly = new Button(buttonSize*2,brush.y,buttonSize,buttonSize);
+	Button circle = new Button(buttonSize*3,brush.y,buttonSize,buttonSize);
+	Button tri = new Button(buttonSize*4,brush.y,buttonSize,buttonSize);
 	imageDrawing(int _x, int _y) {
 		xoff = _x;
 		yoff = _y;
@@ -292,17 +331,27 @@ class imageDrawing{
 
 		brightnessS.display(sM);
 		brushSize.display(sM);
-		
+		brush.display(sM);
+		rectangle.display(sM);
+		poly.display(sM);
+		circle.display(sM);
+		tri.display(sM);
+		brush.collide();
+		rectangle.collide();
+		poly.collide();
+		circle.collide();
+		tri.collide();
 		sM.endDraw();
 
 		if (brushSize.active){
 			showStroke();
 		}
+
 		
 		image(sM,xoff,yoff,menuWidth,sM.height);
 	}
 
-	public void collide(PGraphics sM){
+	public void collide(PGraphics sM,int mode){
 		if (mousePressed){
 			if (mouseX<menuWidth && mouseY>spacing+yoff && mouseY<spacing+menuWidth+yoff && activeMenu == 1){
 				updateColor();
@@ -311,6 +360,33 @@ class imageDrawing{
 		brushSize.collide(sM);
 		brightnessS.collide(sM);
 		StrokeWeight = brushSize.value;
+		if (mode == 1){
+			updateDrawType();
+		}
+
+	}
+
+	public void updateDrawType(){
+		if(brush.collide()){
+			drawingType = 0;
+		}
+		else if(rectangle.collide()){
+			drawingType = 1;
+			shapeType = 0;
+		}
+		else if(poly.collide()){
+			drawingType = 1;
+			shapeType = 1;
+		}
+		else if(tri.collide()){
+			drawingType = 1;
+			shapeType = 2;
+		}
+		else if(circle.collide()){
+			drawingType = 1;
+			shapeType = 3;
+		}
+		
 	}
 
 	public void updateColor(){
@@ -325,6 +401,11 @@ class imageDrawing{
 		// strokeWeight(1);
 		ellipse(width-100,100+yoff, StrokeWeight,StrokeWeight);
 		noStroke();
+	}
+
+	public int setYLocation(int size){
+		yLocation += size;
+		return yLocation;
 	}
 }
 class menuBar{
@@ -453,7 +534,6 @@ public void processOption(String s){
 	}
 
 
-
 public void clearPage(){
 	if (activePage){
 		page.beginDraw();
@@ -462,6 +542,7 @@ public void clearPage(){
 		backGround.beginDraw();
 		backGround.background(pageColor);
 		backGround.endDraw();
+		undo.undoDepth=0;
 	}
 }
 

@@ -5,7 +5,7 @@ void drawPage(int drawingType){
 			painting();
 			break;
 		case 1:
-			shape(4,false);
+			shape(shapeType,false);
 
 	}
 
@@ -39,14 +39,11 @@ void chooseShape(int mode){
 			polygon(false);
 			break;
 		case 2:
-			polygon(true);
-			break;
-		case 3:
 			page.triangle((points.get(0)[0]+correctedX)/2,points.get(0)[1],points.get(0)[0],correctedY,correctedX,correctedY);
 			break;
-		case 4:
+		case 3:
 			page.ellipse(points.get(0)[0],points.get(0)[1], dist(points.get(0)[0],points.get(0)[1],correctedX,correctedY)*2, dist(points.get(0)[0],points.get(0)[1],correctedX,correctedY)*2);
-
+			break;
 
 
 	}

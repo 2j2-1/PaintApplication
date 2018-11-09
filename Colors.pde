@@ -9,3 +9,6 @@ color menuText = color(255);
 //Page Color
 color pageColor = color(255);
 color brushColor = color(0);
+
+//Button
+color buttonFill = color(40);

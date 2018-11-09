@@ -49,7 +49,6 @@ void processOption(String s){
 	}
 
 
-
 void clearPage(){
 	if (activePage){
 		page.beginDraw();

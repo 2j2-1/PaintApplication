@@ -21,13 +21,14 @@ int drawY = 500;
 int textSize = 16;
 
 int drawingType = 1;
+int shapeType = 0;
 
 int[] clickStart = {-1,-1};
 ArrayList<int[]> points = new ArrayList<int[]>();
 
 void settings(){
-	fullScreen();
-	// size(640,640);
+	// fullScreen();
+	size(640,640);
 }
 void setup(){
 	menu = new menuBar();
@@ -49,7 +50,7 @@ void draw(){
 		processOption(menu.chosenOption);
 		menu.chosenOption = null;
 	}
-	iD.collide(sideMenu);
+	iD.collide(sideMenu,0);
 	// pageCollide(mouse);
 	if (mousePressed && clickStart[0]==-1 && clickStart[1]==-1){
 		clickStart[0] = mouseX;
@@ -61,7 +62,7 @@ void mouseClicked(){
 	if (mouseButton == LEFT){
 		if (!screenGrab){
 			menu.collide();
-			iD.collide(sideMenu);
+			iD.collide(sideMenu,1);
 			if (pageCollide(mouseX,mouseY)){
 				addPoint();
 			}
