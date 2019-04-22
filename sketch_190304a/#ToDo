@@ -1,0 +1,52 @@
+#ToDo
+
+Convert a colour image to a black-and-white and greyscale versions of the image (week 2 lectures and labs)
+
+Change contrast/brightness of an image using Point Functions (see week 9 lectures labs)
+
+Implement convolution filter to blur, sharpen and find edges (see Week 10 lecture)
+
+Change Hue, saturation using own RGB-HSV conversion (see Week 4 lecture)
+
+Draw and Arc with the mouse
+
+Drawing Curves of any type
+
+Resizing the image using bi-linear interpolation (week 7 lecture)
+
+Saving and re-loading of drawing data as separate file. (not covered, DIY!)
+
+Further geometric manipulation of shape once drawn (moving, scaling, rotating) (not covered, DIY!)
+
+
+#Finished
+
+Draw a line with the mouse
+
+Place Circles with the mouse.
+
+Place Rectangles with the mouse.
+
+Drawing “live” shapes to the canvas (stored for further manipulation) - Circle, line & rectangle
+
+Selecting shape(s) with the mouse.
+
+Set Line weight once selected
+
+Use of sliders to alter image “live” (see Week 16 lecture)
+
+Use of own colour pickers to set line and fill colour of shapes. (not covered, DIY!)
+
+Load and save image from/to file using basic Processing (see Getting Started with Processing Book)
+
+Set Fill colour of shape once selected
+
+Altering line colour once selected
+
+Loading image and saving processed image via user interface button and file dialogue
+
+Draw open polyline with mouse
+
+Draw and close a polyline with mouse, which then becomes a polygon that can be filled
+
+Deleting shapes.
