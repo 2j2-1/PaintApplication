@@ -8,15 +8,16 @@ Implement convolution filter to blur, sharpen and find edges (see Week 10 lectur
 
 Change Hue, saturation using own RGB-HSV conversion (see Week 4 lecture)
 
-Draw and Arc with the mouse
-
-Drawing Curves of any type
-
 Resizing the image using bi-linear interpolation (week 7 lecture)
+
+
+#Optional
 
 Saving and re-loading of drawing data as separate file. (not covered, DIY!)
 
-Further geometric manipulation of shape once drawn (moving, scaling, rotating) (not covered, DIY!)
+Draw and Arc with the mouse
+
+Drawing Curves of any type
 
 
 #Finished
@@ -50,3 +51,5 @@ Draw open polyline with mouse
 Draw and close a polyline with mouse, which then becomes a polygon that can be filled
 
 Deleting shapes.
+
+Further geometric manipulation of shape once drawn (moving, scaling, rotating) (not covered, DIY!)

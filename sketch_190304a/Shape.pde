@@ -6,6 +6,7 @@ class Shape{
  PImage image;
  boolean filled;
  PShape shape;
+ float rotation = 0;
 
  
  Shape(int _x1, int _y1, int _x2, int _y2, String _shapeName, color _strokeColor,color _fillColor, int _strokeWeight, boolean _filled){
@@ -48,8 +49,9 @@ class Shape{
    }
    shape = createShape();
    shape.beginShape();
-   for (int[] point:_points){
-    shape.vertex(point[0]-x1,point[1]-y1);
+   for (int i = 0; i < _points.size();i+=1){
+    shape.vertex(_points.get(i)[0]-x1,_points.get(i)[1]-y1);
+    //shape.curveVertex(_points.get(i+1)[0]-x1,_points.get(i+1)[1]-y1);
    }
    if (filled)
      shape.endShape(CLOSE);
@@ -87,7 +89,13 @@ class Shape{
      else
        shape.setFill(true);
      shape.setFill(fillColor);
+     shape.translate(x2/2,y2/2);
+     shape.rotate(rotation);
+     shape.translate(-x2/2,-y2/2);
      pg.shape(shape, x1, y1);
+     shape.translate(x2/2,y2/2);
+     shape.rotate(-rotation);
+     shape.translate(-x2/2,-y2/2);
    }
    pg.endDraw();
  }

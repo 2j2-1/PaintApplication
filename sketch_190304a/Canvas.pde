@@ -71,14 +71,15 @@ class Canvas{
    }
  }
  void addLine(){
-   if (mouseButton == LEFT){
-     int[] temp = {(int)mouseX(),(int)mouseY()};
-     points.add(temp);
-     pg.beginDraw();
-     for(int i = 0; i<points.size()-1;i++){
-       pg.line(points.get(i)[0],points.get(i)[1],points.get(i+1)[0],points.get(i+1)[1]);
+   int[] temp = {(int)mouseX(),(int)mouseY()};
+   if (mouseButton == LEFT ){
+     if (points.size() == 0){
+       points.add(temp);
      }
-     pg.endDraw();
+     else if((int)mouseX()!=points.get(points.size()-1)[0] && (int)mouseY() != points.get(points.size()-1)[0]){
+       points.add(temp);
+     }
+     
    } else{
      activeShapes.add(new Shape(shapeName,strokeColor,fillColor,strokeWeight,shapeFilled,points));
      mode = 0;
@@ -102,20 +103,22 @@ class Canvas{
  
  void resizeShape(){
    float x,y;
+   if (mainCanvas.focusShape != null){
    x = mouseX()-mainCanvas.focusShape.x1;
    y = mouseY()-mainCanvas.focusShape.y1;
-   if (mainCanvas.focusShape != null && x>0 && y>0){
+   
+   if (x>0 && y>0){
      if (mainCanvas.focusShape.shapeName != "image")
        mainCanvas.focusShape.shape.scale(x/mainCanvas.focusShape.x2,y/mainCanvas.focusShape.y2);
      mainCanvas.focusShape.x2 = max((int)x,1);
      mainCanvas.focusShape.y2 = max((int)y,1);
-     
+   }
    }
  }
  void rotateShape(){
    if (mainCanvas.focusShape != null){
      if (mainCanvas.focusShape.shapeName != "image")
-       mainCanvas.focusShape.shape.rotate(tan(mouseX()/mouseY()));
+       mainCanvas.focusShape.rotation = atan2(mouseY() - mainCanvas.focusShape.y1-mainCanvas.focusShape.y2/2 , mouseX() - mainCanvas.focusShape.x1-mainCanvas.focusShape.x2/2);
    }
  }
  
@@ -145,12 +148,19 @@ class Canvas{
  
  void draw(){
   drawShapes();
+  pg.beginDraw();
+  for(int i = 0; i<points.size()-1;i++){
+    pg.line(points.get(i)[0],points.get(i)[1],points.get(i+1)[0],points.get(i+1)[1]);
+  }
+  pg.endDraw();
   if (focusShape != null){
    focusShape.focus(pg); 
   }
   scale(scale[0],scale[1]);
   image(pg, offset[0]/scale[0], offset[1]/scale[1]); 
  }
+ 
+
  
  float mouseX(){
    return (mouseX-offset[0])/scale[0];
@@ -167,5 +177,6 @@ class Canvas{
  float pmouseY(){
    return (pmouseY-offset[1])/scale[1];
  }
+ 
 
 }

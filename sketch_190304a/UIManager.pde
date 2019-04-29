@@ -137,6 +137,7 @@ class UIManager{
        break;
      case "Rotate":
        mainCanvas.mode = 5;
+       break;
      case "Delete":
        if (mainCanvas.focusShape != null){
          for (int i = 0; i < mainCanvas.activeShapes.size();i++){
@@ -147,6 +148,28 @@ class UIManager{
          }
        }
        mainCanvas.mode = 0;
+       break;
+     case "BlackWhite":
+       mainCanvas.pg.colorMode(RGB);
+       if (mainCanvas.focusShape != null && mainCanvas.focusShape.shapeName == "image"){
+         for (int y = 0; y < mainCanvas.focusShape.image.height; y++) {
+          for (int x = 0; x < mainCanvas.focusShape.image.width; x++){
+            color thisPix = mainCanvas.focusShape.image.get(x,y);
+            int r = (int) red(thisPix);
+            int g = (int) green(thisPix);
+            int b = (int) blue(thisPix);
+            color newColour = color((g+r+b)/3);
+            mainCanvas.focusShape.image.set(x,y, newColour);
+          }
+        }
+       }
+       break;
+     //Fixed this 
+     case "PointProcessing":
+     if (mainCanvas.focusShape != null && mainCanvas.focusShape.shapeName == "image"){
+       int[] lut = makeSigmoidLUT();
+       mainCanvas.focusShape.image = applyPointProcessing(lut,lut,lut, mainCanvas.focusShape.image);
+     }
    }
  }
  
