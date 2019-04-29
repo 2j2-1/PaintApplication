@@ -3,10 +3,14 @@ class Shape{
  String shapeName;
  color strokeColor;
  color fillColor;
+ PImage imageOG;
  PImage image;
  boolean filled;
  PShape shape;
  float rotation = 0;
+ float[][] matrix = null;
+ float scale;
+ int brightness = 0;
 
  
  Shape(int _x1, int _y1, int _x2, int _y2, String _shapeName, color _strokeColor,color _fillColor, int _strokeWeight, boolean _filled){
@@ -60,11 +64,12 @@ class Shape{
  }
  Shape(int _x1, int _y1, int _x2, int _y2, String _shapeName, String _image){
    x1 = _x1;
-   x2 = _x2;
    y1 = _y1;
-   y2 = _y2;
    shapeName = _shapeName;
+   colorMode(RGB);
    image = loadImage(_image);
+   x2 = _x2;
+   y2 = _y2;
  }
  
  void focus(PGraphics pg){
@@ -80,7 +85,10 @@ class Shape{
  void draw(PGraphics pg){
    pg.beginDraw();
    if (shapeName == "image")
-     pg.image(image,x1,y1,x2,y2);
+     if (matrix != null)
+       pg.image(applybrightness(bilinear(x2,y2,convo(image,matrix)),brightness),x1,y1);
+     else
+       pg.image(applybrightness(bilinear(x2,y2,image),brightness),x1,y1);
    else{
      shape.setStroke(strokeColor);
      shape.setStrokeWeight(strokeWeight);

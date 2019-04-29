@@ -2,9 +2,9 @@ class UIManager{
  ArrayList<Widget> widgets = new ArrayList<Widget>();
  int x = 0;
  int y = 0;
- int offsetX = 700;
  int offsetY = 30;
  int padding = 10;
+ int offsetX = canvasSize[0]+canvasPostion[0]+padding;
  int col = 4;
  int buttonSize = 30;
  int sliderSize = 10;
@@ -40,6 +40,14 @@ class UIManager{
        else
          x+=buttonSize+padding;
        break;
+     case "toggleButton":
+     if (x>0){
+        x = 0;
+        y+=buttonSize+padding;
+       }
+       uim.widgets.add(new toggleButton(offsetX+x,offsetY+y,buttonSize,buttonSize,s,16));
+       y+=16+padding/2;
+       break;
      case "Title":
        if (x>0){
         x = 0;
@@ -61,15 +69,18 @@ class UIManager{
         x = 0;
         y+=buttonSize+padding;
        }
-       uim.widgets.add(new Slider(offsetX+x,offsetY+y,colorPickerSize,sliderSize,s,0,100,mainCanvas.strokeWeight));
+       uim.widgets.add(new Slider(offsetX+x,offsetY+y,colorPickerSize,sliderSize,s,0,184,mainCanvas.strokeWeight));
        y+=sliderSize+padding;
    }
  }
- 
- void activity(){
+ void draw(){
    for (Widget widget : widgets){
      widget.draw();
-    if(widget.collide() && mousePressed && focusWindow){
+   }
+ }
+ void activity(){
+   for (Widget widget : widgets){
+    if(widget.collide() && focusWindow){
       widget.focus();
       widget.run();
     }
@@ -164,13 +175,12 @@ class UIManager{
         }
        }
        break;
-     //Fixed this 
-     case "PointProcessing":
+    case "PointProcessing":
      if (mainCanvas.focusShape != null && mainCanvas.focusShape.shapeName == "image"){
-       int[] lut = makeSigmoidLUT();
-       mainCanvas.focusShape.image = applyPointProcessing(lut,lut,lut, mainCanvas.focusShape.image);
+       mainCanvas.focusShape.brightness += 10;
+       colorMode(RGB);
      }
+     break;
    }
  }
- 
 }

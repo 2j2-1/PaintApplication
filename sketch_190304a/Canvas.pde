@@ -43,7 +43,7 @@ class Canvas{
  }
  
  boolean collide(){
-   return (mouseX() >= 0 && mouseX() <= pg.width && mouseY() >= 0 && mouseY <= pg.height);
+   return (mouseX() >= 0 && mouseX() <= pg.width && mouseY() >= 0 && mouseY() <= pg.height);
  }
  
  void activity(){
@@ -110,6 +110,7 @@ class Canvas{
    if (x>0 && y>0){
      if (mainCanvas.focusShape.shapeName != "image")
        mainCanvas.focusShape.shape.scale(x/mainCanvas.focusShape.x2,y/mainCanvas.focusShape.y2);
+     
      mainCanvas.focusShape.x2 = max((int)x,1);
      mainCanvas.focusShape.y2 = max((int)y,1);
    }

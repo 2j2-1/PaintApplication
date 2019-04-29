@@ -1,20 +1,22 @@
-int[] canvasSize = {640,640};
-int[] canvasRes = {640,640};
+int[] canvasSize = {840,840};
+int[] canvasRes = {840,840};
 int[] canvasPostion = {30,30};
 Canvas mainCanvas = new Canvas(canvasSize,canvasPostion,canvasRes);
 UIManager uim = new UIManager();
 boolean focusWindow = true;
+int[] lut = makeSigmoidLUT();
 String[][] ui = {
 {"Title","Color Picker"},{"ColorPicker",""},{"colorButton","strokeColorPicker"},{"colorButton","fillColorPicker"},
 {"Title","Line Width"},{"Slider","Line Width"},
 {"Title","Drawing"},{"Button","Rect"},{"Button","Circle"},{"Button","Line"},
 {"Title","Manipulation"},{"Button","Select"},{"Button","Move"},{"Button","Resize"},{"Button","Rotate"},{"Button","Delete"},{"Button","BlackWhite"},{"Button","PointProcessing"},
 {"Title","File"},{"Button","Save"},{"Button","Load"},
-{"Title","Fill Mode"},{"Button","Fill"},{"Button","Nofill"}
+{"Title","Fill Mode"},{"Button","Fill"},{"Button","Nofill"},
+{"Title","Filters"},{"toggleButton","Edge"},{"toggleButton","Blur"},{"toggleButton","Sharpen"}
 };
 
 void settings(){
-  size(900,700);
+  size(1100,900);
 }
 void setup() {
   mainCanvas.setup();
@@ -26,7 +28,7 @@ void setup() {
 
 void draw() {
   mainCanvas.clear();
-  uim.activity();
+  uim.draw();
   mainCanvas.activity();
   mainCanvas.draw();
 }
@@ -48,4 +50,8 @@ void folderSelected(File selection){
 
 void mousePressed() {
    focusWindow = true;
+}
+
+void mouseClicked(){
+  uim.activity();
 }

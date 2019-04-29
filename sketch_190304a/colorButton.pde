@@ -23,18 +23,21 @@ class colorButton extends Widget{
  
  void draw(){
    canvas.pg.beginDraw();
-   canvas.pg.noStroke();
+   canvas.pg.strokeWeight(2);
    if (s=="strokeColorPicker"){
      if (mainCanvas.focusShape == null)
        canvas.pg.fill(mainCanvas.strokeColor);
      else 
        canvas.pg.fill(mainCanvas.focusShape.strokeColor);
    }
-   else
+   else if (s=="fillColorPicker")
      if (mainCanvas.focusShape == null)
        canvas.pg.fill(mainCanvas.fillColor);
      else 
        canvas.pg.fill(mainCanvas.focusShape.fillColor);
+   else {
+     canvas.pg.fill(c);
+   }
    canvas.pg.rect(0,0,x2,y2);
    canvas.pg.endDraw();
    canvas.draw();
