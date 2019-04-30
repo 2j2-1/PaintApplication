@@ -30,7 +30,8 @@ class Button extends Widget{
    canvas.draw();
  }
  
- void run(){
-   uim.buttonHandler(s);
+ void run(int mode){
+   if (mode == 1)
+     uim.buttonHandler(s);
  }
 }

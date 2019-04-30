@@ -11,9 +11,10 @@ class Shape{
  float[][] matrix = null;
  float scale;
  int brightness = 0;
+ int contrast = 0;
 
  
- Shape(int _x1, int _y1, int _x2, int _y2, String _shapeName, color _strokeColor,color _fillColor, int _strokeWeight, boolean _filled){
+ Shape(int _x1, int _y1, int _x2, int _y2, String _shapeName, color _strokeColor,color _fillColor, int _strokeWeight, boolean _filled,int _brightness){
    x1 = _x1;
    x2 = _x2;
    y1 = _y1;
@@ -23,6 +24,7 @@ class Shape{
    fillColor = _fillColor;
    strokeWeight = _strokeWeight;
    filled = _filled;
+   brightness = _brightness;
    switch (shapeName){
      case "rect":
        shape = createShape(RECT, 0, 0, x2, y2);
@@ -100,6 +102,7 @@ class Shape{
      shape.translate(x2/2,y2/2);
      shape.rotate(rotation);
      shape.translate(-x2/2,-y2/2);
+     colorMode(RGB);
      pg.shape(shape, x1, y1);
      shape.translate(x2/2,y2/2);
      shape.rotate(-rotation);

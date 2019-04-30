@@ -17,6 +17,7 @@ class Canvas{
  boolean shapeFilled = true;
  boolean colorPickerChoice = true;
  ArrayList<int[]> points = new ArrayList<int[]>();
+ int brightness = 0;
  
  
  Canvas(int[] _size, int[] _offset, int[] _res){
@@ -132,13 +133,15 @@ class Canvas{
  } 
  
  void drawShapes(){
-  for (Shape shape : activeShapes){
-    shape.draw(pg);
-  }
+  if (focusWindow){
+    for (Shape shape : activeShapes){
+      shape.draw(pg);
+    }
+   }
  }
  
  void createShape(){
-   activeShapes.add(new Shape((int)mouseX(),(int)mouseY(),100,100,shapeName,strokeColor,fillColor,strokeWeight,shapeFilled));
+   activeShapes.add(new Shape((int)mouseX(),(int)mouseY(),100,100,shapeName,strokeColor,fillColor,strokeWeight,shapeFilled,0));
    mode = 0;
  }
  

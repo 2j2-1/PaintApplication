@@ -44,7 +44,8 @@ class toggleButton extends Widget{
    canvas.draw();
  }
  
- void run(){
+ void run(int mode){
+   if (mode==0){
    switch(s){
      case "Edge":
          if (mainCanvas.focusShape != null && mainCanvas.focusShape.shapeName == "image"){
@@ -87,6 +88,7 @@ class toggleButton extends Widget{
          }
          mainCanvas.mode = 0;
          break;
+   }
    }
  }
 }

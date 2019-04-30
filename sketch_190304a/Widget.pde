@@ -14,7 +14,7 @@ class Widget{
   canvas.setup(); 
  }
  
- void run(){}
+ void run(int mode){}
  
  void draw(){}
  

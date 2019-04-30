@@ -69,20 +69,34 @@ class UIManager{
         x = 0;
         y+=buttonSize+padding;
        }
-       uim.widgets.add(new Slider(offsetX+x,offsetY+y,colorPickerSize,sliderSize,s,0,184,mainCanvas.strokeWeight));
+       uim.widgets.add(new Slider(offsetX+x,offsetY+y,colorPickerSize,sliderSize,s,0,100,mainCanvas.strokeWeight));
        y+=sliderSize+padding;
+       break;
    }
+ }
+ void add(String widgetName, String s,int min, int max){
+   switch(widgetName){
+     case "Slider":
+         if (x>0){
+            x = 0;
+            y+=buttonSize+padding;
+         }
+         uim.widgets.add(new Slider(offsetX+x,offsetY+y,colorPickerSize,sliderSize,s,min,max,0));
+         y+=sliderSize+padding;
+         break;
+     }
  }
  void draw(){
    for (Widget widget : widgets){
      widget.draw();
    }
  }
- void activity(){
+ void activity(int mode){
    for (Widget widget : widgets){
-    if(widget.collide() && focusWindow){
+    if(widget.collide() && focusWindow && (mousePressed||mode==0)){
+      
       widget.focus();
-      widget.run();
+      widget.run(mode);
     }
    }
  }
@@ -160,8 +174,8 @@ class UIManager{
        }
        mainCanvas.mode = 0;
        break;
-     case "BlackWhite":
-       mainCanvas.pg.colorMode(RGB);
+     case "GreyScale":
+       colorMode(RGB);
        if (mainCanvas.focusShape != null && mainCanvas.focusShape.shapeName == "image"){
          for (int y = 0; y < mainCanvas.focusShape.image.height; y++) {
           for (int x = 0; x < mainCanvas.focusShape.image.width; x++){
@@ -170,6 +184,28 @@ class UIManager{
             int g = (int) green(thisPix);
             int b = (int) blue(thisPix);
             color newColour = color((g+r+b)/3);
+            mainCanvas.focusShape.image.set(x,y, newColour);
+          }
+        }
+       }
+       break;
+       case "BlackWhite":
+       colorMode(RGB);
+       if (mainCanvas.focusShape != null && mainCanvas.focusShape.shapeName == "image"){
+         for (int y = 0; y < mainCanvas.focusShape.image.height; y++) {
+          for (int x = 0; x < mainCanvas.focusShape.image.width; x++){
+            color thisPix = mainCanvas.focusShape.image.get(x,y);
+            int r = (int) red(thisPix);
+            int g = (int) green(thisPix);
+            int b = (int) blue(thisPix);
+            color newColour = color(255,255,255);
+            if((g+r+b)/3<50){
+               newColour = color(0,0,0);
+            }
+            else{
+             newColour = color(255,255,255); 
+            }
+           
             mainCanvas.focusShape.image.set(x,y, newColour);
           }
         }

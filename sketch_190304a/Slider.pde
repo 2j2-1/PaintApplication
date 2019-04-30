@@ -31,19 +31,26 @@ class Slider extends Widget{
    canvas.pg.fill(255);
    canvas.pg.rect(0,0,x2,y2);
    canvas.pg.fill(0);
-   canvas.pg.ellipse(map(value,min,max,0,y1),y2/2,y2,y2);
+   canvas.pg.ellipse(map(value,min,max,0,x2),y2/2,y2,y2);
    canvas.pg.endDraw();
    canvas.draw();
  }
  
- void run(){
-  value = (int) map(mouseX-x1,0,y1,min,max);
+ void run(int mode){
+  value = (int) map(mouseX,x1,x1+x2,min,max);
   if (s=="Line Width"){
     if (mainCanvas.focusShape == null){
        mainCanvas.strokeWeight = value;
      }
      else{
        mainCanvas.focusShape.strokeWeight = value;
+     }
+   }else if (s=="Brightness"){
+    if (mainCanvas.focusShape == null){
+       mainCanvas.brightness = value;
+     }
+     else{
+        mainCanvas.focusShape.brightness = value;
      }
    }
  }

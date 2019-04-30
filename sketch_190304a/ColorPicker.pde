@@ -26,7 +26,12 @@ class ColorPicker extends Widget{
    colorMode(HSB, 100);
    for (int x = 0; x < x2; x++){
      for (int y = 0; y < y2; y++){
-       canvas.pg.pixels[x + (y)*x2] = color(map(x,0,x2,0,100),map(y,0,y2,0,100),100);
+       if (mainCanvas.focusShape == null || mainCanvas.focusShape.shapeName == "image"){
+         canvas.pg.pixels[x + (y)*x2] = color(map(x,0,x2,0,100),map(y,0,y2,0,100),map(mainCanvas.brightness,-100,100,0,100));
+       }
+       else{
+         canvas.pg.pixels[x + (y)*x2] = color(map(x,0,x2,0,100),map(y,0,y2,0,100),map(mainCanvas.focusShape.brightness,-100,100,0,100));
+       }
       }
     }
    canvas.pg.updatePixels();
@@ -34,19 +39,19 @@ class ColorPicker extends Widget{
    canvas.draw();
  }
  
- void run(){
+ void run(int mode){
    colorMode(HSB, 100);
    if (mainCanvas.focusShape == null){
      if (mainCanvas.colorPickerChoice)
-       mainCanvas.strokeColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),100);
+       mainCanvas.strokeColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),map(mainCanvas.brightness,-100,100,0,100));
      else
-       mainCanvas.fillColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),100);
+       mainCanvas.fillColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),map(mainCanvas.brightness,-100,100,0,100));
    }
    else{
      if (mainCanvas.colorPickerChoice)
-       mainCanvas.focusShape.strokeColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),100);
+       mainCanvas.focusShape.strokeColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),map(mainCanvas.focusShape.brightness,-100,100,0,100));
      else
-       mainCanvas.focusShape.fillColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),100);
+       mainCanvas.focusShape.fillColor = color(map(mouseX,x1,x1+x2,0,100),map(mouseY,y1,y1+y2,0,100),map(mainCanvas.focusShape.brightness,-100,100,0,100));
    }
  }
 }

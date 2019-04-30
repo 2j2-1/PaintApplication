@@ -43,7 +43,7 @@ class colorButton extends Widget{
    canvas.draw();
  }
  
- void run(){
+ void run(int mode){
    uim.buttonHandler(s);
  }
 }
